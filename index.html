@@ -6,9 +6,13 @@
     <title>File</title>
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <style>
+    body,html{
+        margin:0;
+        padding: 0;
+    }
     .main {
         width: 40%;
-        margin: 0 auto;
+        margin: 10px auto;
         transition: all 0.5s;
     }
 
@@ -28,16 +32,6 @@
         .main {
             width: 90%;
         }
-    }
-
-    #box {
-        /*background: skyblue;*/
-        display: block;
-    }
-
-    .item {
-        padding: 10px;
-        box-sizing: border-box;
     }
 
     .choose {
@@ -106,10 +100,13 @@
 
     @media (max-width: 500px) {
         .main {
-            width: 100%;
+            width: 90%;
         }
         .btns .btn {
             width: 33.33%;
+        }
+        .btns .btn:nth-child(3) {
+            padding-right: 0;
         }
         .btns .btn:nth-child(4) {
             padding-left: 0;
@@ -120,40 +117,109 @@
     }
 
     #box {
+        width: 100%;
         margin-top: 10px;
-        border: 2px solid #ddd;
-        overflow: hidden;
-    }
-
-    #box #left {
-        width: 20%;
-        float: left;
-        padding: 10px;
-        box-sizing: border-box;
-    }
-
-    #box #right {
-        overflow: hidden;
-        padding: 10px;
-        box-sizing: border-box;
+        margin-bottom: 20px;
     }
 
     .item {
-        line-height: 10px;
+        overflow: hidden;
+        border-bottom: 1px solid #ddd;
+        padding: 10px;
+    }
+
+    .item .left {
+        float: left;
+        width: 30%;
+    }
+
+    .item .right {
+        overflow: hidden;
+        word-wrap: break-word;
     }
 
     .title {
         padding-left: 10px;
-        padding-bottom: 5px;
+        padding-bottom: 10px;
         box-sizing: border-box;
-        margin-bottom: 5px;
+        margin-bottom: 10px;
         border-bottom: 1px solid #ddd;
+        font-size: 19px;
+        font-weight: bold;
+    }
+
+    #gen {
+        display: none;
+        padding: 10px 10px 10px 0;
+    }
+
+    .totop {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        width: 20px;
+        text-align: center;
+        background: rgba(0, 0, 0, 0.1);
+        font-size: 15px;
+        padding: 5px;
+        cursor: pointer;
+        display: none;
+    }
+    .info{
+        padding:10px 0 10px 0;
+    }
+    .bg{
+        width: 100%;
+        position: relative;
+        font-size: 0;
+    }
+    .bg img{
+        width: 100%;
+        height:400px;
+        object-fit: cover;
+    }
+    .bg .mask{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.2);
+    }
+    .bg .crs{
+        font-size: 2rem;
+        position: absolute;
+        color: #fff;
+        top: 50%;
+        transform: translate(0,-50%);
+        left: 10%;
+    }
+    @media (max-width: 700px){
+        .bg .crs{
+            font-size: 2rem;
+            position: absolute;
+            color: #fff;
+            top: 50%;
+            transform: translate(-50%,-50%);
+            left: 50%
+        }
     }
     </style>
 </head>
 
 <body>
+    <div class="bg">
+        <div class="mask"></div>
+        <div class="crs">
+            自定义随机选择器 <br>
+            CRS(Custem Random Selector)
+        </div>
+        <img src="https://raw.githubusercontent.com/wiki/garuhester/ImageBed/crs.jpg" alt="">
+    </div>
     <div class="main">
+        <div class="info">
+            <!-- 使用方法： -->
+        </div>
         <div>
             <label class="choose" for="browse">Choose File (.txt)</label>
             <input type="file" id="browse" name="browse" style="display: none">
@@ -164,29 +230,28 @@
                 <div class="b" onclick="addData()">Add</div>
             </div>
             <div class="btn">
-                <div class="b">Delete</div>
+                <div class="b" onclick="deleteData()">Delete</div>
             </div>
             <div class="btn">
-                <div class="b">Generate</div>
+                <div class="b" onclick="generateData()">Generate</div>
             </div>
             <div class="btn">
                 <div class="b" onclick="clearData()">Clear</div>
             </div>
             <div class="btn">
-                <div class="b">Save</div>
+                <div class="b" onclick="saveData()">Save</div>
             </div>
         </div>
-        <div id="box">
-            <div id="left"></div>
-            <div id="right"></div>
-        </div>
+        <div id="gen"></div>
+        <div id="box"></div>
+        <div class="totop" onclick="backtotop()">返回顶部</div>
     </div>
     <script>
     var box = document.getElementById("box");
-    var left = document.getElementById("left");
-    var right = document.getElementById("right");
     var browse = document.getElementById('browse');
     var input = document.getElementById('input');
+    var gen = document.getElementById('gen');
+    var totop = document.querySelector('.totop');
 
     init();
 
@@ -195,7 +260,7 @@
         if (items != null) {
             show(items);
         } else {
-            box.style.border = "none";
+            box.innerHTML = "当前无数据";
         }
     }
 
@@ -209,10 +274,12 @@
                 reader.readAsText(file);
                 reader.onload = function() {
                     arr = this.result.split("\n").map((num) => num.trim());
+                    arr = arr.filter((a) => a != "");
                     var r = clearData();
                     if (r) {
                         localStorage.setItem("hester-random-generator", JSON.stringify(arr));
                         show(arr);
+                        document.querySelector(".choose").innerHTML = file.name;
                     }
                     browse.value = "";
                 }
@@ -223,8 +290,14 @@
     }
 
     document.addEventListener("keydown", function(event) {
-        if (event.keyCode == 13) {
-            addData();
+        var code = event.keyCode;
+        switch (code) {
+            case 13:
+                addData();
+                break;
+            case 46:
+                deleteData();
+                break;
         }
     });
 
@@ -238,40 +311,107 @@
             localStorage.setItem("hester-random-generator", JSON.stringify(items));
             show(items);
         }
+        input.value = "";
     }
 
     function clearData() {
-        if (left.innerHTML != "" && right.innerHTML != "") {
+        if (box.innerHTML.indexOf("当前无数据") == -1) {
             var r = confirm("是否要清除当前数据！！");
             if (r) {
                 localStorage.removeItem("hester-random-generator");
-                left.innerHTML = "";
-                right.innerHTML = "";
+                box.innerHTML = "当前无数据";
                 browse.value = "";
-                box.style.border = "none";
+                gen.style.display = "none";
             }
             return r;
         }
         return true;
     }
 
-    function show(arr) {
-        left.innerHTML = "";
-        right.innerHTML = "";
-        var html = "";
-        html = "<div class='title'>序号</div>";
-        left.innerHTML = html;
-        html = "<div class='title'>候选项</div>";
-        right.innerHTML = html;
-        for (var i = 0; i < arr.length; i++) {
-            if (arr[i] != "") {
-                html = "<div class='item'>" + (i + 1) + "</div>";
-                left.innerHTML += html;
-                html = "<div class='item'>" + arr[i].trim() + "</div>";
-                right.innerHTML += html;
+    function deleteData() {
+        var items = JSON.parse(localStorage.getItem("hester-random-generator"));
+        if (!items) {
+            alert("当前无数据");
+        } else {
+            var index = input.value;
+            if (index > items.length) {
+                alert("没有该数据");
+            } else if (!index || !(/^[0-9]*$/.test(index))) {
+                alert("请输入候选项序号")
+            } else {
+                items.splice(index - 1, 1);
+                localStorage.setItem("hester-random-generator", JSON.stringify(items));
+                show(items);
             }
         }
-        box.style.border = "2px solid #ddd";
+        input.value = "";
+    }
+
+    function generateData() {
+        if (box.innerHTML.indexOf("当前无数据") == -1) {
+            var items = JSON.parse(localStorage.getItem("hester-random-generator"));
+            var ranNum = ~~(Math.random() * items.length);
+            gen.style.display = "block";
+            gen.innerHTML = "推荐您使用：" + items[ranNum];
+        } else {
+            alert("当前无数据");
+            gen.style.display = "none";
+        }
+    }
+
+    function show(arr) {
+        box.innerHTML = "";
+        var html = "";
+        html += "<div class=\"item\">";
+        html += "  <div class=\"left\" style=\"font-weight:bold\">序号<\/div>";
+        html += "  <div class=\"right\" style=\"font-weight:bold\">候选项<\/div>";
+        html += "<\/div>";
+        box.innerHTML = html;
+        for (var i = 0; i < arr.length; i++) {
+            if (arr[i] != "") {
+                html = "";
+                html += "<div class=\"item\">";
+                html += "  <div class=\"left\">" + (i + 1) + "<\/div>";
+                html += "  <div class=\"right\">" + arr[i].trim() + "<\/div>";
+                html += "<\/div>";
+                box.innerHTML += html;
+            }
+        }
+    }
+
+    function backtotop() {
+        var c = document.documentElement.scrollTop || document.body.scrollTop;
+        if (c > 0) {
+            window.requestAnimationFrame(backtotop);
+            window.scrollTo(0, c - c / 5);
+        }
+    }
+
+    window.onscroll = function() {
+        var top = document.documentElement.scrollTop;
+        if (top > 200) {
+            totop.style.display = "block";
+        } else {
+            totop.style.display = "none";
+        }
+    }
+
+    function saveData() {
+        var items = JSON.parse(localStorage.getItem("hester-random-generator"));
+        download('data.txt', items.join("\n"));
+    }
+
+    function download(filename, text) {
+        var pom = document.createElement('a');
+        pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        pom.setAttribute('download', filename);
+        if (document.createEvent) {
+            var event = document.createEvent('MouseEvents');
+            event.initEvent('click', true, true);
+            pom.dispatchEvent(event);
+        } else {
+            pom.click();
+        }
     }
     </script>
 </body>
