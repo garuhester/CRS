@@ -6,10 +6,12 @@
     <title>File</title>
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <style>
-    body,html{
-        margin:0;
+    body,
+    html {
+        margin: 0;
         padding: 0;
     }
+
     .main {
         width: 40%;
         margin: 10px auto;
@@ -166,59 +168,69 @@
         cursor: pointer;
         display: none;
     }
-    .info{
-        padding:10px 0 10px 0;
+
+    .info {
+        padding: 10px 0 10px 0;
     }
-    .bg{
+
+    .bg {
         width: 100%;
         position: relative;
         font-size: 0;
     }
-    .bg img{
+
+    .bg img {
         width: 100%;
-        height:400px;
+        height: 400px;
         object-fit: cover;
     }
-    .bg .mask{
+
+    .bg .mask {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0,0,0,0.2);
+        background: rgba(0, 0, 0, 0.2);
     }
-    .bg .crs{
+
+    .bg .crs {
         font-size: 2rem;
         position: absolute;
         color: #fff;
         top: 50%;
-        transform: translate(0,-50%);
+        transform: translate(0, -50%);
         left: 10%;
     }
-    @media (max-width: 700px){
-        .bg .crs{
+
+    @media (max-width: 700px) {
+        .bg .crs {
             font-size: 2rem;
             position: absolute;
             color: #fff;
             top: 50%;
-            transform: translate(-50%,-50%);
+            transform: translate(-50%, -50%);
             left: 50%
         }
     }
-    .info div{
+
+    .info div {
         line-height: 25px;
         margin-bottom: 5px;
     }
-    .info div:nth-child(1){
+
+    .info div:nth-child(1) {
         font-weight: bold;
     }
-    .info div span{
+
+    .info div span {
         background: pink;
         padding: 0 5px 0 5px;
         margin: 0 3px 0 3px;
         border-radius: 3px;
     }
-    .cho{
+
+    .cho {
         margin-top: 15px;
     }
     </style>
@@ -228,8 +240,8 @@
     <div class="bg">
         <div class="mask"></div>
         <div class="crs">
-            自定义随机选择器 <br>
-            CRS(Custem Random Selector)
+            自定义随机选择器
+            <br> CRS(Custem Random Selector)
         </div>
         <img src="./crs.jpg" alt="">
     </div>
@@ -433,9 +445,9 @@
 
     function saveData() {
         var items = JSON.parse(localStorage.getItem("hester-random-generator"));
-        if(items){
+        if (items) {
             download('data.txt', items.join("\n"));
-        }else{
+        } else {
             alert("当前无数据");
         }
     }
